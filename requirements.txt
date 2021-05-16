@@ -1,8 +1,11 @@
 pytest>=6.2.2
 seaborn>=0.11.0
 scipy>=1.5.1
-numpy>=1.19.0
-pandas>=1.1.2
 matplotlib>=3.3.2
-tqdm>=4.48.0
-copia
+folium==0.11.0
+tqdm==4.60.0
+selenium==3.141.0
+pandas==1.1.5
+numpy==1.19.5
+webdriver_manager==3.2.2
+copia==0.1.2
