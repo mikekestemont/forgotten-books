@@ -1,3 +1,5 @@
+[![DOI](https://zenodo.org/badge/360837483.svg)](https://zenodo.org/badge/latestdoi/360837483)
+
 # Forgotten Books
 
 ## Paper
