@@ -3,7 +3,7 @@
 ## Paper
 This repository holds the code and data accompanying the following paper:
 
-"Forgotten Books: The Application of Unseen Species Models to the Survival of Medieval Literature" [2021], by Mike Kestemont, Folgert Karsdorp, Elisabeth de Bruijn, Matthew J. Driscoll, Katarzyna A. Kapitan, Pádraig Ó Macháin, Daniel Sawyer, Remco Sleiderink & Anne Chao.
+"Forgotten Books: The Application of Unseen Species Models to the Survival of Medieval Literature" [2021], by Mike Kestemont, Folgert Karsdorp, Elisabeth de Bruijn, Matthew Driscoll, Katarzyna A. Kapitan, Pádraig Ó Macháin, Daniel Sawyer, Remco Sleiderink & Anne Chao.
 
 > *Abstract*: Unseen species models are an important instrument in the unbiased monitoring of biodiversity. The applicability of these methods extends beyond ecology, however, as recent studies highlight ties between ecological and cultural (e.g., linguistic) diversity. Analogous to observation bias in biostatistics, the study of human culture is generally hindered by the incomplete survival of material artefacts. To help remedy issues of survivorship bias, we apply established estimators from ecology to statistically gauge the centuries-long loss of cultural diversity. We focus on the cultural domain of medieval narratives (heroic and chivalric literature), a hallmark of Western European culture, as attested in contemporary, handwritten documents. Our results confirm the overall severity of the sustained losses but reveal a wide range of survival rates across six representative vernaculars. Two insular literatures (Icelandic and Irish) combine a remarkably high evenness and survival rate, which we tentatively link to parallel observations about ecological diversity in island regions.
 
