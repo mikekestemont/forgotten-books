@@ -33,7 +33,8 @@ The copia package is documented [here](https://copia.readthedocs.io/en/latest/).
 ## Persistent archiving
 Releases of this repository are sustainably mirrored on [Zenodo](https://zenodo.org/), ensuring long-term archival access to this material. Please consider citing the accompanying paper if you re-use this code for academic purposes.
 
-Shield: [![CC BY-SA 4.0][cc-by-sa-shield]][cc-by-sa]
+## License
+[![CC BY-SA 4.0][cc-by-sa-shield]][cc-by-sa]
 
 This work is licensed under a
 [Creative Commons Attribution-ShareAlike 4.0 International License][cc-by-sa].
