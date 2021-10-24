@@ -8,4 +8,4 @@ selenium==3.141.0
 pandas==1.1.5
 numpy==1.19.5
 webdriver_manager==3.2.2
-copia==0.1.2
+copia==0.1.3
