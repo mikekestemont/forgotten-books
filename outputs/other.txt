@@ -1,0 +1,30 @@
+\begin{tabular}{lllrrr}
+\toprule
+{} &  tradition &    estimator &  survival &    lci &    uci \\
+\midrule
+0  &      Dutch &        chao1 &     0.492 &  0.335 &  0.681 \\
+18 &      Dutch &  egghe proot &     0.440 &  0.278 &  0.643 \\
+12 &      Dutch &       ichao1 &     0.437 &  0.291 &  0.615 \\
+6  &      Dutch &    jackknife &     0.424 &  0.332 &  0.587 \\
+1  &    English &        chao1 &     0.386 &  0.239 &  0.573 \\
+19 &    English &  egghe proot &     0.318 &  0.187 &  0.491 \\
+13 &    English &       ichao1 &     0.367 &  0.222 &  0.562 \\
+7  &    English &    jackknife &     0.338 &  0.254 &  0.505 \\
+2  &     French &        chao1 &     0.535 &  0.435 &  0.641 \\
+20 &     French &  egghe proot &     0.374 &  0.287 &  0.470 \\
+14 &     French &       ichao1 &     0.505 &  0.407 &  0.610 \\
+8  &     French &    jackknife &     0.434 &  0.361 &  0.544 \\
+3  &     German &        chao1 &     0.790 &  0.657 &  0.915 \\
+21 &     German &  egghe proot &     0.653 &  0.476 &  0.838 \\
+15 &     German &       ichao1 &     0.750 &  0.614 &  0.887 \\
+9  &     German &    jackknife &     0.707 &  0.610 &  0.841 \\
+4  &  Icelandic &        chao1 &     0.773 &  0.632 &  0.910 \\
+22 &  Icelandic &  egghe proot &     0.721 &  0.543 &  0.904 \\
+16 &  Icelandic &       ichao1 &     0.731 &  0.593 &  0.879 \\
+10 &  Icelandic &    jackknife &     0.727 &  0.652 &  0.820 \\
+5  &      Irish &        chao1 &     0.810 &  0.707 &  0.914 \\
+23 &      Irish &  egghe proot &     0.791 &  0.645 &  0.944 \\
+17 &      Irish &       ichao1 &     0.810 &  0.683 &  0.944 \\
+11 &      Irish &    jackknife &     0.732 &  0.671 &  0.804 \\
+\bottomrule
+\end{tabular}
