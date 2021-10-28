@@ -184,7 +184,6 @@ if __name__ == "__main__":
     parser.add_argument("-m", "--mu", type=float, nargs="+", default=None)
     parser.add_argument("-i", "--iterations", type=int, default=10_000)
     parser.add_argument("-w", "--workers", type=int, default=1)
-    parser.add_argument("-o", "--outfile", type=str, default="populations.json")
     args = parser.parse_args()
 
     if args.mu is None:
