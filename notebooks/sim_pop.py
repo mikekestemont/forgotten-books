@@ -1,10 +1,36 @@
 import argparse
-import json
 import itertools
+import json
+import multiprocessing as mp
+
+from datetime import datetime
 
 from tqdm import tqdm
 import numpy as np
 from numba import jit, njit, prange
+
+
+class Parallel:
+    def __init__(self, n_workers, n_tasks):
+        self.pool = mp.Pool(n_workers)
+        self._results = []
+        self._pb = tqdm(total=n_tasks)
+
+    def apply_async(self, fn, args=None):
+        self.pool.apply_async(fn, args=args, callback=self._completed)
+
+    def _completed(self, result):
+        self._results.append(result)
+        self._pb.update()
+
+    def join(self):
+        self.pool.close()
+        self.pool.join()
+
+    def result(self):
+        self._pb.close()
+        self.pool.close()
+        return self._results
 
 
 @njit
@@ -45,10 +71,13 @@ class NeutralModel:
     Agent-based Evolutionary Model.
     """
 
-    def __init__(self, n=100_000, mu=0.0005, init_num_traits=2, seed=None):
+    def __init__(
+        self, n=100_000, mu=0.0005, init_num_traits=2, seed=None, disable_pbar=False
+    ):
         self.n = n
         self.mu = mu
         self.init_num_traits = init_num_traits
+        self.disable_pbar = disable_pbar
 
         # random number generator
         self.rnd = np.random.RandomState(seed)
@@ -70,7 +99,7 @@ class NeutralModel:
         Burnin
         """
         iterations = 0
-        with tqdm(desc="burn-in") as pb:
+        with tqdm(desc="burn-in", disable=self.disable_pbar) as pb:
             while self.population.min() <= self.init_num_traits:
                 iterations += 1
                 self.step()
@@ -101,7 +130,7 @@ class NeutralModel:
         self.num_traits += n_innovations
 
     def postfit(self, iterations=10_000):
-        for _ in tqdm(range(iterations), desc="post-burn-in"):
+        for _ in tqdm(range(iterations), desc="post-burn-in", disable=self.disable_pbar):
             self.step()
         return self
 
@@ -111,8 +140,22 @@ class NetworkModel(NeutralModel):
     Agent-based Evolutionary Model.
     """
 
-    def __init__(self, n=100_000, mu=0.0005, init_num_traits=2, k=3, seed=None):
-        super().__init__(n=n, mu=mu, init_num_traits=init_num_traits, seed=seed)
+    def __init__(
+        self,
+        n=100_000,
+        mu=0.0005,
+        init_num_traits=2,
+        k=3,
+        disable_pbar=False,
+        seed=None,
+    ):
+        super().__init__(
+            n=n,
+            mu=mu,
+            init_num_traits=init_num_traits,
+            disable_pbar=disable_pbar,
+            seed=seed,
+        )
         self.k = k
 
         if self.n == self.k:
@@ -126,36 +169,50 @@ class NetworkModel(NeutralModel):
         return sample(self.population, self.adjacency_matrix).astype(np.int64)
 
 
-# parameter ranges:
-num_agents = (10000, )
-ks = (10, 25)
-num_simulations = 5
+def simulate(agents, k, mu, postfit_iterations):
+    simulator = NetworkModel(n=agents, mu=mu, k=k, disable_pbar=True)
+    simulator.fit()
+    simulator.postfit(postfit_iterations)
+    return np.array([agents, k, mu]), simulator.population
 
-# fixed parameters:
-num_postfit = 100
-init_num_traits = 2
-mu = 0.0005
-outfile = 'populations.json'
 
-# first, network simulations:
-populations = {k:[] for k in ks}
-network_combs = list(itertools.product(*(num_agents, ks,
-                                list(range(num_simulations)))))
-for idx, (agents, k, sim) in enumerate(network_combs):
-    print(f'# agents={agents} | k={k} | simulation {sim + 1}/{num_simulations} | network-exp {idx + 1}/{len(network_combs)}')
-    p = NetworkModel(n=agents, k=k, mu=mu, init_num_traits=init_num_traits)\
-                    .fit().postfit(num_postfit).population
-    populations[k].append(p.tolist())
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-a", "--agents", type=int, nargs="+", default=(1_000,))
+    parser.add_argument("-k", "--degree", type=int, nargs="+", default=(2, 10, 100))
+    parser.add_argument("-s", "--simulations", type=int, default=1_000)
+    parser.add_argument("-m", "--mu", type=float, nargs="+", default=None)
+    parser.add_argument("-i", "--iterations", type=int, default=10_000)
+    parser.add_argument("-w", "--workers", type=int, default=1)
+    parser.add_argument("-o", "--outfile", type=str, default="populations.json")
+    args = parser.parse_args()
 
-# secondly, neutral simulations:
-reference_combs = list(itertools.product(*(num_agents,
-                                list(range(num_simulations)))))
-populations['neutral'] = []
-for idx, (na, sim) in enumerate(reference_combs):
-    print(f'# agents={agents} | k=neutral | simulation {sim + 1}/{num_simulations} | neutral-exp {idx + 1}/{len(reference_combs)}')
-    p = NeutralModel(n=agents, mu=mu, init_num_traits=init_num_traits)\
-                    .fit().postfit(num_postfit).population
-    populations['neutral'].append(p.tolist())
+    if args.mu is None:
+        mu = tuple([50 / agents for agents in args.agents])
+        args.__dict__["mu"] = mu
 
-with open(outfile, 'w') as f:
-    f.write(json.dumps(populations))
+    pool = Parallel(args.workers, args.simulations * len(args.mu) * len(args.agents) * len(args.degree))
+    for i in range(args.simulations):
+        for agents in args.agents:
+            for mu in args.mu:
+                for degree in args.degree:
+                    pool.apply_async(simulate, args=(agents, degree, mu, args.iterations))
+    pool.join()
+
+    params, populations = zip(*pool.result())
+    max_len = max(len(population) for population in populations)
+    populations = [
+        np.pad(population, (0, max_len - len(population)), "constant")
+        for population in populations
+    ]
+    params, populations = np.vstack(params), np.vstack(populations)
+
+    now = datetime.now().strftime("%Y%m%d%H%M%S")
+    np.savez_compressed(
+        f"{now}.npz",
+        params=params.astype(np.float64),
+        populations=populations,
+    )
+
+    with open(f"{now}.params.json", "w") as f:
+        json.dump(args.__dict__, f)
