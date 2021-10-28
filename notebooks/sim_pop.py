@@ -192,10 +192,10 @@ if __name__ == "__main__":
 
     pool = Parallel(args.workers, args.simulations * len(args.mu) * len(args.agents) * len(args.degree))
     for i in range(args.simulations):
-        for agents in args.agents:
-            for mu in args.mu:
-                for degree in args.degree:
-                    pool.apply_async(simulate, args=(agents, degree, mu, args.iterations))
+        for j, agents in enumerate(args.agents):
+            mu = args.mu[j]
+            for degree in args.degree:
+                pool.apply_async(simulate, args=(agents, degree, mu, args.iterations))
     pool.join()
 
     params, populations = zip(*pool.result())
