@@ -11,10 +11,10 @@ from numba import jit, njit, prange
 
 
 class Parallel:
-    def __init__(self, n_workers, n_tasks):
+    def __init__(self, n_workers, n_tasks, pbar_position=0):
         self.pool = mp.Pool(n_workers)
         self._results = []
-        self._pb = tqdm(total=n_tasks)
+        self._pb = tqdm(total=n_tasks, position=pbar_position)
 
     def apply_async(self, fn, args=None):
         self.pool.apply_async(fn, args=args, callback=self._completed)
@@ -32,21 +32,47 @@ class Parallel:
         self.pool.close()
         return self._results
 
+    
+def reindex_array(x):
+    _, x = np.unique(x, return_inverse=True)
+    return x
+    
 
 @njit
 def rand_choice_nb(arr, prob):
     return arr[np.searchsorted(np.cumsum(prob), np.random.random(), side="right")]
 
 
+# @njit(parallel=True)
+# def sample(population, adjacency_matrix):
+#     new_population = np.zeros(population.shape[0])
+#     for i in prange(adjacency_matrix.shape[0]):
+#         neighborhood = population * adjacency_matrix[i]
+#         counts = np.bincount(neighborhood[neighborhood > 0])
+#         prob = counts / counts.sum()
+#         traits = np.flatnonzero(counts)
+#         new_population[i] = rand_choice_nb(traits, prob[prob > 0])
+#     return new_population
+
 @njit(parallel=True)
 def sample(population, adjacency_matrix):
     new_population = np.zeros(population.shape[0])
     for i in prange(adjacency_matrix.shape[0]):
         neighborhood = population * adjacency_matrix[i]
-        counts = np.bincount(neighborhood[neighborhood > 0])
+        data = np.sort(neighborhood[neighborhood > 0])
+        traits = np.unique(data)
+        counts = np.zeros(traits.shape[0])
+        count = 0
+        j = 0
+        for k in range(1, data.shape[0]):
+            count += 1
+            if data[k] > data[k - 1]:
+                counts[j] = count
+                count = 0
+                j += 1
+        counts[j] = count + 1
         prob = counts / counts.sum()
-        traits = np.flatnonzero(counts)
-        new_population[i] = rand_choice_nb(traits, prob[prob > 0])
+        new_population[i] = rand_choice_nb(traits, prob)
     return new_population
 
 
@@ -94,17 +120,21 @@ class NeutralModel:
         self.num_traits = len(np.unique(self.population)) + 1
         assert self.num_traits == self.init_num_traits + 1
 
+    def __repr__(self):
+        return f"agents={self.n}, mu={self.mu}"
+
     def fit(self):
         """
         Burnin
         """
         iterations = 0
-        with tqdm(desc="burn-in", disable=self.disable_pbar) as pb:
+        with tqdm(desc=f"burn-in: {self}", disable=self.disable_pbar, position=1) as pb:
             while self.population.min() <= self.init_num_traits:
                 iterations += 1
                 self.step()
                 pb.update()
         # print(f'burn-in halted after {iterations} iterations')
+        self.population = reindex_array(self.population)
         return self
 
     def _sample(self):
@@ -130,7 +160,7 @@ class NeutralModel:
         self.num_traits += n_innovations
 
     def postfit(self, iterations=10_000):
-        for _ in tqdm(range(iterations), desc="post-burn-in", disable=self.disable_pbar):
+        for _ in tqdm(range(iterations), desc=f"post-burn-in: {self}", disable=self.disable_pbar, position=2):
             self.step()
         return self
 
@@ -165,12 +195,15 @@ class NetworkModel(NeutralModel):
         self.adjacency_matrix = generate_network(self.n, self.k)
         assert self.adjacency_matrix.shape == (self.n, self.n)
 
+    def __repr__(self):
+        return f"agents={self.n}, mu={self.mu}, k={self.k}"
+
     def _sample(self):
         return sample(self.population, self.adjacency_matrix).astype(np.int64)
 
 
 def simulate(agents, k, mu, postfit_iterations):
-    simulator = NetworkModel(n=agents, mu=mu, k=k, disable_pbar=True)
+    simulator = NetworkModel(n=agents, mu=mu, k=k, disable_pbar=False)
     simulator.fit()
     simulator.postfit(postfit_iterations)
     return np.array([agents, k, mu]), simulator.population
@@ -187,10 +220,13 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     if args.mu is None:
-        mu = tuple([50 / agents for agents in args.agents])
+        mu = [0.005] * len(args.agents) #tuple([50 / agents for agents in args.agents])
         args.__dict__["mu"] = mu
 
-    pool = Parallel(args.workers, args.simulations * len(args.mu) * len(args.agents) * len(args.degree))
+    pool = Parallel(
+        args.workers, args.simulations * len(args.agents) * len(args.degree),
+        pbar_position=0
+    )
     for i in range(args.simulations):
         for j, agents in enumerate(args.agents):
             mu = args.mu[j]
