@@ -188,9 +188,6 @@ class NetworkModel(NeutralModel):
         )
         self.k = k
 
-        if self.n == self.k:
-            return NeutralModel(n, mu, init_num_traits, seed=seed)
-
         # initialize network topology
         self.adjacency_matrix = generate_network(self.n, self.k)
         assert self.adjacency_matrix.shape == (self.n, self.n)
@@ -203,7 +200,10 @@ class NetworkModel(NeutralModel):
 
 
 def simulate(agents, k, mu, postfit_iterations):
-    simulator = NetworkModel(n=agents, mu=mu, k=k, disable_pbar=False)
+    if agents == k:
+        simulator = NeutralModel(n=agents, mu=mu, disable_pbar=True)
+    else:
+        simulator = NetworkModel(n=agents, mu=mu, k=k, disable_pbar=False)
     simulator.fit()
     simulator.postfit(postfit_iterations)
     return np.array([agents, k, mu]), simulator.population
@@ -214,6 +214,7 @@ if __name__ == "__main__":
     parser.add_argument("-a", "--agents", type=int, nargs="+", default=(1_000,))
     parser.add_argument("-k", "--degree", type=int, nargs="+", default=(2, 10, 100))
     parser.add_argument("-s", "--simulations", type=int, default=1_000)
+    parser.add_argument("-r", "--reference", action="store_true")
     parser.add_argument("-m", "--mu", type=float, nargs="+", default=None)
     parser.add_argument("-i", "--iterations", type=int, default=10_000)
     parser.add_argument("-w", "--workers", type=int, default=1)
@@ -228,10 +229,15 @@ if __name__ == "__main__":
         pbar_position=0
     )
     for i in range(args.simulations):
-        for j, agents in enumerate(args.agents):
-            mu = args.mu[j]
-            for degree in args.degree:
-                pool.apply_async(simulate, args=(agents, degree, mu, args.iterations))
+        if not args.reference:
+            for j, agents in enumerate(args.agents):
+                mu = args.mu[j]
+                for degree in args.degree:
+                    pool.apply_async(simulate, args=(agents, degree, mu, args.iterations))
+        else:
+            for j, agents in enumerate(args.agents):
+                mu = args.mu[j]
+                pool.apply_async(simulate, args=(agents, agents, mu, args.iterations))
     pool.join()
 
     params, populations = zip(*pool.result())
