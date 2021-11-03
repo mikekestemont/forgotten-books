@@ -7,11 +7,12 @@ This repository holds the code and data accompanying the following paper:
 
 "Forgotten Books: The Application of Unseen Species Models to the Survival of Culture" [2021], by Mike Kestemont, Folgert Karsdorp, Elisabeth de Bruijn, Matthew Driscoll, Katarzyna A. Kapitan, Pádraig Ó Macháin, Daniel Sawyer, Remco Sleiderink & Anne Chao.
 
-> *Abstract*:  Unseen species models are an important instrument in the unbiased monitoring of biodiversity. The applicability of these methods extends beyond ecology, however, as recent studies highlight ties between ecological and cultural (e.g., linguistic) diversity. Analogous to observation bias in biostatistics, the study of human culture is generally hindered by the incomplete survival of material artefacts. To help remedy issues of survivorship bias, we apply established estimators from ecology to statistically gauge the centuries-long loss of cultural diversity. We focus on the domain of heroic and chivalric narrative, a mainstay of medieval literature in Western Europe, as attested in contemporary, handwritten documents. Our results confirm the overall severity of the sustained losses but reveal a wide range of survival rates across six representative vernaculars. Two insular literatures (Icelandic and Irish) combine a remarkably high evenness and survival rate, which we tentatively link to parallel observations about ecological diversity in island regions.
+> *Abstract*:  The study of ancient cultures is hindered by the incomplete survival of material artefacts, so that we commonly under-estimate the diversity of the cultural production in historic societies. To correct for this survivorship bias, we apply unseen species models from ecology and gauge the loss of narratives from medieval Europe, such as the romances about King Arthur. The obtained estimates are compatible with the scant historic evidence. Besides events like library fires, we identify the original evenness of populations as an overlooked factor in their stability in the face of immaterial loss. We link the elevated evenness in island literatures to parallel accounts of ecological and cultural diversity in insular communities. Our analyses call for a wider application of these methods across the heritage sciences.
 
 ## Code
 The Jupyter notebooks under the `notebooks` folder hold all the Python code which we used for the analysis, including the additional experiments reported in the SI:
-  - `analysis.ipynb`: code for the analysis
+  - `analysis.ipynb`: code for the unseen species models
+  - `analyze_pop.ipynb` (and `sim_pop.py`) for the evenness simulations
   - `geolocate.ipynb`: code used for plotting the heatmaps
 
 The code heavily relies on the open-source `copia` [package](https://github.com/mikekestemont/copia), co-developed by Mike Kestemont and Folgert Karsdorp, that is available from PyPI:
