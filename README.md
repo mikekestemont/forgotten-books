@@ -12,10 +12,10 @@ This repository holds the code and data accompanying the following paper:
 
 ## Code
 The Jupyter notebooks under the `notebooks` folder hold all the Python code which we used for the analysis, including the additional experiments reported in the SI and the R code for reproducing our findings:
-  - `analysis.ipynb`: code for the unseen species models
-  - `analyze_pop.ipynb` (and `sim_pop.py`) for the evenness simulations
-  - `geolocate.ipynb`: code used for plotting the heatmaps
-  - `Copia.R`: the analogous R code to reproduce our findings
+  - `analysis.ipynb`: code for the unseen species models;
+  - `analyze_pop.ipynb` (and `sim_pop.py`) for the evenness simulations;
+  - `geolocate.ipynb`: code used for plotting the heatmaps;
+  - `Copia.R`: the analogous R code to reproduce our findings for the unseen species models.
 
 The code heavily relies on the open-source `copia` [package](https://github.com/mikekestemont/copia), co-developed by Mike Kestemont and Folgert Karsdorp, that is available from PyPI:
 
