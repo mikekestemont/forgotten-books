@@ -37,17 +37,8 @@
          "name":"Anne Chao"
       }
    ],
-   "license":{
-      "description":"License for open access content.",
-      "title":"License",
-      "type":"string",
-      "default":"CC-BY-NC-SA"
-   },
-   "access_right":{
-      "default":"open",
-      "description":"Access right for record.",
-      "type":"string"
-   },
+   "license":"CC-BY-SA",
+   "access_right":"open",
    "title":"Forgotten books: supplementary materials (data and code)",
    "related_identifiers":[
       {
@@ -57,8 +48,5 @@
          "resource_type":"publication-article"
       }
    ],
-   "description":{
-      "description":"This archival repository holds the most recent version of the code and data supporting the paper 'Forgotten Books: The Application of Unseen Species Models to the Survival of Culture' (2022), by Mike Kestemont, Folgert Karsdorp, Elisabeth de Bruijn, Matthew Driscoll, Katarzyna A. Kapitan, Pádraig Ó Macháin, Daniel Sawyer, Remco Sleiderink and Anne Chao.",
-      "type":"string"
-   }
+   "description":"This archival repository holds the most recent version of the code and data supporting the paper 'Forgotten Books: The Application of Unseen Species Models to the Survival of Culture' (2022), by Mike Kestemont, Folgert Karsdorp, Elisabeth de Bruijn, Matthew Driscoll, Katarzyna A. Kapitan, Pádraig Ó Macháin, Daniel Sawyer, Remco Sleiderink and Anne Chao."
 }
