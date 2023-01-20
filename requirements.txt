@@ -12,3 +12,4 @@ copia==0.1.3
 numba==0.53.1
 networkx==2.6.3
 SciencePlots==1.0.9
+openpyxl>=3.0.10
